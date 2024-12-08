@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>계산기</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+      }
+
+      .calculator {
+        background-color: #333;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .display {
+        background-color: #fff;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        text-align: right;
+        font-size: 24px;
+        min-height: 40px;
+      }
+
+      .buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+      }
+
+      button {
+        padding: 15px;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #666;
+        color: white;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #888;
+      }
+
+      button.operator {
+        background-color: #ff9500;
+      }
+
+      button.operator:hover {
+        background-color: #ffaa33;
+      }
+
+      button.clear {
+        background-color: #ff3b30;
+      }
+
+      button.clear:hover {
+        background-color: #ff5442;
+      }
+
+      button.equals {
+        background-color: #34c759;
+      }
+
+      button.equals:hover {
+        background-color: #46d86b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <div class="display" id="display">0</div>
+      <div class="buttons">
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button class="operator" onclick="addOperator('/')">/</button>
+        <button class="operator" onclick="addOperator('*')">×</button>
+        <button class="operator" onclick="addOperator('-')">-</button>
+
+        <button onclick="addNumber('7')">7</button>
+        <button onclick="addNumber('8')">8</button>
+        <button onclick="addNumber('9')">9</button>
+        <button class="operator" onclick="addOperator('+')">+</button>
+
+        <button onclick="addNumber('4')">4</button>
+        <button onclick="addNumber('5')">5</button>
+        <button onclick="addNumber('6')">6</button>
+        <button onclick="addNumber('.')">.</button>
+
+        <button onclick="addNumber('1')">1</button>
+        <button onclick="addNumber('2')">2</button>
+        <button onclick="addNumber('3')">3</button>
+        <button class="equals" onclick="calculate()">=</button>
+
+        <button onclick="addNumber('0')" style="grid-column: span 3">0</button>
+      </div>
+    </div>
+
+    <script>
+      let displayValue = "0";
+      let waitingForOperand = false;
+
+      const display = document.getElementById("display");
+
+      function updateDisplay() {
+        display.textContent = displayValue;
+      }
+
+      function addNumber(num) {
+        if (waitingForOperand) {
+          displayValue = num;
+          waitingForOperand = false;
+        } else {
+          displayValue = displayValue === "0" ? num : displayValue + num;
+        }
+        updateDisplay();
+      }
+
+      function addOperator(operator) {
+        if (
+          !displayValue.endsWith(" + ") &&
+          !displayValue.endsWith(" - ") &&
+          !displayValue.endsWith(" * ") &&
+          !displayValue.endsWith(" / ")
+        ) {
+          displayValue += " " + operator + " ";
+          updateDisplay();
+        }
+        waitingForOperand = false;
+      }
+
+      function clearDisplay() {
+        displayValue = "0";
+        waitingForOperand = false;
+        updateDisplay();
+      }
+
+      function calculate() {
+        try {
+          // 곱셈 기호 변환
+          let expression = displayValue.replace(/×/g, "*");
+          let result = eval(expression);
+
+          // 소수점 자리 제한
+          if (Number.isFinite(result)) {
+            if (Number.isInteger(result)) {
+              displayValue = result.toString();
+            } else {
+              displayValue = result.toFixed(8).replace(/\.?0+$/, "");
+            }
+          } else {
+            displayValue = "Error";
+          }
+
+          waitingForOperand = true;
+          updateDisplay();
+        } catch (e) {
+          displayValue = "Error";
+          updateDisplay();
+          waitingForOperand = true;
+        }
+      }
+    </script>
+  </body>
+</html>
